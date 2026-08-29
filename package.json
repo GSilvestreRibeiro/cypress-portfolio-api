@@ -1,0 +1,21 @@
+{
+  "name": "cypress-portfolio-api",
+  "version": "1.0.0",
+  "description": "Projeto de testes de API do Northwind",
+  "keywords": [
+    "cypress",
+    "api",
+    "rest",
+    "northwind"
+  ],
+  "license": "ISC",
+  "author": "Guilherme Ribeiro",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx cypress run"
+  },
+  "devDependencies": {
+    "cypress": "^15.21.1"
+  }
+}
