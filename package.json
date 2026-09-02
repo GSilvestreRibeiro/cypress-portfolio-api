@@ -16,6 +16,7 @@
     "test": "npx cypress run"
   },
   "devDependencies": {
-    "cypress": "^15.21.0"
+    "cypress": "^15.21.0",
+    "cypress-plugin-api": "^2.12.2"
   }
 }
