@@ -29,6 +29,29 @@ class UsersApi {
         })
 
     }
+
+    consultUserByEmail(email){
+        return cy.api({
+            url: `/usuarios?email=${email}`,
+        })
+    }
+
+    consultUser(query = {}) {
+        const params = new URLSearchParams(query).toString()
+        const url = params ? `/usuarios?${params}` : '/usuarios'
+
+        return cy.api({
+            url,
+            failOnStatusCode: false
+        })
+    }
+
+    consultUserById(usuarioId){
+        return cy.api ({
+            url: `/usuarios/${usuarioId}`,
+            failOnStatusCode: false
+        })
+    }
 }
 
 export default UsersApi
