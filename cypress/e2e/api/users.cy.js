@@ -1,4 +1,4 @@
-import UsersApi from '../api/users.api'
+import UsersApi from '../../api/users.api'
 
 
 describe('Users', () => {
@@ -191,6 +191,13 @@ describe('Users', () => {
 
       })
     })
+    it('deve retornar erro na busca por path id sem enviar o id', () => {
+
+      usersApi.consultUserById().then(response => {
+        expect(response.status).to.eq(400)
+        expect(response.body.id).to.eq('id deve ter exatamente 16 caracteres alfanuméricos')
+      })
+    })
   })
 
   context('login', () => {
@@ -211,15 +218,17 @@ describe('Users', () => {
       })
     })
 
-    it('deve retornar mensagem de email ou senha inválidos para senha errada', () => {
+    it('deve recusar login para senha errada', () => {
       usersApi.login(userRegister.email, 'SenhaErrada').then(response => {
         expect(response.status).to.eq(401)
+        expect(response.body.message).to.eq('Email e/ou senha inválidos')
       })
     })
 
-    it('deve retornar mensagem de email ou senha inválidos para email errado', () => {
+    it('deve recusar login email errado', () => {
       usersApi.login('emailerrado@qa.com.br', userRegister.password).then(response => {
         expect(response.status).to.eq(401)
+        expect(response.body.message).to.eq('Email e/ou senha inválidos')
 
       })
     })
