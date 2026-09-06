@@ -1,0 +1,12 @@
+{
+    "user": {
+        "email": "guilherme@gmail.com",
+        "password": "SenhaForte@123"
+    },
+    "createProduct": {
+        "nome": "Logitech PRO X TKL RAPID",
+        "preco": 800,
+        "descricao": "Teclado",
+        "quantidade": 200
+    }
+}

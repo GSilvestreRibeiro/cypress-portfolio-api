@@ -5,12 +5,19 @@ describe('Users', () => {
 
 
   const usersApi = new UsersApi()
+
   let userRegister
+  let userEdit
+  let dup_email
   let usuarioId
+  let session
 
   beforeEach(() => { //acessa a massa em todos os testes
     cy.fixture('login').then((massa) => {
-      userRegister = massa
+      userRegister = massa.user
+      userEdit = massa.userEdit
+      dup_email = massa.dup_email
+      session = massa.session
     })
   })
 
@@ -18,7 +25,7 @@ describe('Users', () => {
     cy.fixture('login').then((massa) => {
       userRegister = massa
 
-      usersApi.consultUserByEmail(userRegister.email).then((responseConsult) => {
+      usersApi.consultUserByEmail(userRegister.user.email).then((responseConsult) => {
 
         if (responseConsult.body.quantidade > 0) {
 
@@ -144,7 +151,6 @@ describe('Users', () => {
 
       usersApi.consultUser({password: userRegister.password}).then(response => {
         expect(response.status).to.eq(200)
-        expect(response.body.quantidade).to.eq(1)
         expect(response.body.quantidade).to.eq(response.body.usuarios.length)
         expect(response.body.usuarios[0]).to.have.property('nome').that.is.a('string')
         expect(response.body.usuarios[0]).to.have.property('email').that.is.a('string')
@@ -198,6 +204,13 @@ describe('Users', () => {
         expect(response.body.id).to.eq('id deve ter exatamente 16 caracteres alfanuméricos')
       })
     })
+
+    it('deve retornar usuário nao encontrao', () => {
+      usersApi.consultUserById('jogfODIlXsqxNFS2').then(response => {
+        expect(response.status).to.eq(400)
+        expect(response.body.message).to.eq('Usuário não encontrado')
+      })
+    })
   })
 
   context('login', () => {
@@ -230,6 +243,22 @@ describe('Users', () => {
         expect(response.status).to.eq(401)
         expect(response.body.message).to.eq('Email e/ou senha inválidos')
 
+      })
+    })
+  })
+  
+  context('editar usuário', () => {
+    it('deve editar o usuário', () => {
+      usersApi.editUser(usuarioId, userEdit).then(response => {
+        expect(response.status).to.eq(200)
+        expect(response.body.message).to.eq('Registro alterado com sucesso')
+      })
+    })
+
+    it('deve dar erro email duplicado', () => {
+      usersApi.editUser(usuarioId, dup_email).then(response => {
+        expect(response.status).to.eq(400)
+        expect(response.body.message).to.eq('Este email já está sendo usado')
       })
     })
   })

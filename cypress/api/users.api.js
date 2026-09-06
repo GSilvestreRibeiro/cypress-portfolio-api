@@ -52,6 +52,15 @@ class UsersApi {
             failOnStatusCode: false
         })
     }
+
+    editUser(usuarioId, userEdit){
+        return cy.api ({
+            url: `/usuarios/${usuarioId}`,
+            method: 'PUT',
+            body: userEdit,
+            failOnStatusCode: false
+        })
+    }
 }
 
 export default UsersApi
