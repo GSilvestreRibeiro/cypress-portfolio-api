@@ -1,14 +1,5 @@
 class ProductApi {
 
-    login(user){
-        return cy.api({
-            url: '/login',
-            method: 'POST',
-            body: user,
-            failOnStatusCode: false
-        })
-    }
-
     create(createProduct, token){
         return cy.api({
             url: '/produtos',

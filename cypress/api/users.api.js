@@ -1,10 +1,10 @@
 class UsersApi {
 
-    create(userRegister){
+    create(body){
         return cy.api({
             url: '/usuarios',
             method: 'POST',
-            body: userRegister,
+            body: body,
             failOnStatusCode: false
         })
     }
@@ -21,9 +21,9 @@ class UsersApi {
         })
     }
 
-    deleteUser(usuarioId){
+    deleteUser(id){
         return cy.api({
-            url: `/usuarios/${usuarioId}`,
+            url: `/usuarios/${id}`,
             method: 'DELETE',
             failOnStatusCode: false
         })
@@ -33,6 +33,7 @@ class UsersApi {
     consultUserByEmail(email){
         return cy.api({
             url: `/usuarios?email=${email}`,
+            failOnStatusCode: false
         })
     }
 
@@ -53,11 +54,11 @@ class UsersApi {
         })
     }
 
-    editUser(usuarioId, userEdit){
+    editUser(usuarioId, user_edit){
         return cy.api ({
             url: `/usuarios/${usuarioId}`,
             method: 'PUT',
-            body: userEdit,
+            body: user_edit,
             failOnStatusCode: false
         })
     }

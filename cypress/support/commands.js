@@ -28,7 +28,47 @@ Cypress.Commands.add('loginSession', (user) => {
     return cy.api({
         url:'/login',
         method: 'POST',
-        body: user,
+        body: { email: user.email,
+                password: user.password },
+        failOnStatusCode: false
+    }).then(response => { return response })
+})
+
+Cypress.Commands.add('cadastrarProduto', (createProduct, token) => {
+    return cy.api({
+        url: '/produtos',
+        method: 'POST',
+        body: createProduct,
+        headers: {
+                authorization: token
+            },
+        failOnStatusCode: false
+    }).then(response => { return response })
+})
+
+Cypress.Commands.add('deletarProduto', (productId, token) => {
+    return cy.api({
+        url: `/produtos/${productId}`,
+        method: 'DELETE',
+        headers: {
+                authorization: token
+            },
+        failOnStatusCode: false
+    }).then(response => { return response })
+})
+
+Cypress.Commands.add('editarUsuario', (usuarioId, user_edit) => {
+    return cy.api({
+        url: `/usuarios/${usuarioId}`,
+        method: 'PUT',
+        body: user_edit,
+        failOnStatusCode: false
+    }).then(response => { return response })
+})
+
+Cypress.Commands.add('consultEmail', (email) => {
+    return cy.api({
+        url: `/usuarios?email=${email}`,
         failOnStatusCode: false
     }).then(response => { return response })
 })

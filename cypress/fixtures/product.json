@@ -1,7 +1,15 @@
 {
     "user": {
+        "nome": "Guilherme Silvestre Ribeiro",
         "email": "guilherme@gmail.com",
-        "password": "SenhaForte@123"
+        "password": "SenhaForte@123",
+        "administrador": "true"
+    },
+    "user_edit": {
+        "nome": "Guilherme Silvestre Ribeiro",
+        "email": "guilherme@gmail.com",
+        "password": "SenhaForte@123",
+        "administrador": "false"
     },
     "createProduct": {
         "nome": "Logitech PRO X TKL RAPID",
