@@ -1,4 +1,4 @@
-import UsersApi from '../../api/users.api'
+import UsersApi from '../../service/usersRequest.api'
 
 
 describe('Users', () => {

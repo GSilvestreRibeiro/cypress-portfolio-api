@@ -1,5 +1,5 @@
-import ProductApi from "../../api/product.api"
-import UsersApi from "../../api/users.api"
+import ProductApi from "../../service/productRequest.api"
+import UsersApi from "../../service/usersRequest.api"
 
 
 describe('Produtos', () => {
@@ -111,6 +111,10 @@ describe('Produtos', () => {
                 })
             })
         })
+    })
+
+    context('listar produtos', () => {
+        
     })
 
     context('excluir produto', () => {
