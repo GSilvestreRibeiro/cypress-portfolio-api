@@ -1,10 +1,7 @@
-import UsersApi from '../../service/usersRequest.api'
-
 
 describe('Users', () => {
 
 
-  const usersApi = new UsersApi()
 
   let user
   let user_edit
@@ -25,25 +22,26 @@ describe('Users', () => {
   before(() => { //exclui o usuário se já houver cadastro na base
     cy.fixture('login').then((massa) => {
 
-      usersApi.consultUserByEmail(massa.user.email).then((responseConsult) => {
+      cy.consultarUsuario({ email: massa.user.email }).then((responseConsult) => {
 
         if (responseConsult.body.quantidade > 0) {
+          cy.log('entrou no if')
           usuarioId = responseConsult.body.usuarios[0]._id
-          usersApi.deleteUser(usuarioId)
+          cy.deletarUsuario(usuarioId)
         }
       })
-      usersApi.consultUserByEmail(massa.user_delete.email).then(responseConsult => {
+      cy.consultarUsuario({ email: massa.user_delete.email }).then(responseConsult => {
 
         if (responseConsult.body.quantidade > 0) {
           usuarioId = responseConsult.body.usuarios[0]._id
-          usersApi.deleteUser(usuarioId)
+          cy.deletarUsuario(usuarioId)
         }
 
-        usersApi.consultUserByEmail(massa.user_edit.email).then(responseConsult => {
+        cy.consultarUsuario({ email: massa.user_edit.email }).then(responseConsult => {
 
           if (responseConsult.body.quantidade > 0) {
             usuarioId = responseConsult.body.usuarios[0]._id
-            usersApi.deleteUser(usuarioId)
+            cy.deletarUsuario(usuarioId)
           }
 
         })
@@ -57,7 +55,7 @@ describe('Users', () => {
 
       delete user.nome
 
-      usersApi.create(user).then(response => {
+      cy.criarUsuario(user).then(response => {
         expect(response.status).to.eq(400)
         expect(response.body.nome).to.eq('nome é obrigatório')
       })
@@ -67,7 +65,7 @@ describe('Users', () => {
 
       delete user.email
 
-      usersApi.create(user).then(response => {
+      cy.criarUsuario(user).then(response => {
         expect(response.status).to.eq(400)
         expect(response.body.email).to.eq('email é obrigatório')
       })
@@ -77,7 +75,7 @@ describe('Users', () => {
 
       delete user.password
 
-      usersApi.create(user).then(response => {
+      cy.criarUsuario(user).then(response => {
         expect(response.status).to.eq(400)
         expect(response.body.password).to.eq('password é obrigatório')
       })
@@ -87,7 +85,7 @@ describe('Users', () => {
 
       delete user.administrador
 
-      usersApi.create(user).then(response => {
+      cy.criarUsuario(user).then(response => {
         expect(response.status).to.eq(400)
         expect(response.body.administrador).to.eq('administrador é obrigatório')
       })
@@ -95,7 +93,7 @@ describe('Users', () => {
 
     it('deve cadastrar usuário', () => {
 
-      usersApi.create(user).then(response => {
+      cy.criarUsuario(user).then(response => {
         expect(response.status).to.eq(201)
         expect(response.body.message).to.eq('Cadastro realizado com sucesso')
         cy.log(JSON.stringify(response.body));
@@ -111,19 +109,20 @@ describe('Users', () => {
 
     it('deve exibir mensagem para e-mail já utilizado', () => {
 
-      usersApi.create(user).then(response => {
+      cy.criarUsuario(user).then(response => {
         expect(response.status).to.eq(400)
         expect(response.body).to.be.an('object')
         expect(response.body.message).to.be.eq('Este email já está sendo usado')
       })
     })
+
   })
 
   context('listar usuários cadastrados', () => {
 
     it('deve listar usuário por _id', () => {
 
-      usersApi.consultUser({ _id: usuarioId }).then(response => {
+      cy.consultarUsuario({ _id: usuarioId }).then(response => {
         expect(response.status).to.eq(200)
         expect(response.body.quantidade).to.eq(1)
         expect(response.body.quantidade).to.eq(response.body.usuarios.length)
@@ -136,7 +135,7 @@ describe('Users', () => {
     })
     it('deve listar usuário por nome', () => {
 
-      usersApi.consultUser({ nome: user.nome }).then(response => {
+      cy.consultarUsuario({ nome: user.nome }).then(response => {
         expect(response.status).to.eq(200)
         expect(response.body.quantidade).to.eq(response.body.usuarios.length)
         expect(response.body.usuarios[0]).to.have.property('nome').that.is.a('string')
@@ -149,7 +148,7 @@ describe('Users', () => {
     })
     it('deve listar usuário por email', () => {
 
-      usersApi.consultUser({ email: user.email }).then(response => {
+      cy.consultarUsuario({ email: user.email }).then(response => {
         expect(response.status).to.eq(200)
         expect(response.body.quantidade).to.eq(1)
         expect(response.body.quantidade).to.eq(response.body.usuarios.length)
@@ -162,7 +161,7 @@ describe('Users', () => {
     })
     it('deve listar usuário por password', () => {
 
-      usersApi.consultUser({ password: user.password }).then(response => {
+      cy.consultarUsuario({ password: user.password }).then(response => {
         expect(response.status).to.eq(200)
         expect(response.body.quantidade).to.eq(response.body.usuarios.length)
         expect(response.body.usuarios[0]).to.have.property('nome').that.is.a('string')
@@ -174,7 +173,7 @@ describe('Users', () => {
     })
     it('deve listar usuário por administrador false', () => {
 
-      usersApi.consultUser({ administrador: 'false' }).then(response => {
+      cy.consultarUsuario({ administrador: 'false' }).then(response => {
         expect(response.status).to.eq(200)
         expect(response.body.quantidade).to.eq(response.body.usuarios.length)
       })
@@ -182,21 +181,21 @@ describe('Users', () => {
     })
     it('deve listar usuário por administrador true', () => {
 
-      usersApi.consultUser({ administrador: 'true' }).then(response => {
+      cy.consultarUsuario({ administrador: 'true' }).then(response => {
         expect(response.status).to.eq(200)
         expect(response.body.quantidade).to.eq(response.body.usuarios.length)
       })
     })
     it('deve listar todos usuários sem campo de filtro', () => {
 
-      usersApi.consultUser('').then(response => {
+      cy.consultarUsuario('').then(response => {
         expect(response.status).to.eq(200)
         expect(response.body.quantidade).to.eq(response.body.usuarios.length)
       })
     })
     it('deve retornar lista vazia', () => {
 
-      usersApi.consultUser({ _id: '454' }).then(response => {
+      cy.consultarUsuario({ _id: '454' }).then(response => {
         expect(response.status).to.eq(200)
         expect(response.body.quantidade).to.eq(0)
         expect(response.body.quantidade).to.eq(response.body.usuarios.length)
@@ -205,21 +204,21 @@ describe('Users', () => {
 
     it('deve retornar usuário por path id', () => {
 
-      usersApi.consultUserById(usuarioId).then(response => {
+      cy.consultarUsuarioPorId(usuarioId).then(response => {
         expect(response.status).to.eq(200)
 
       })
     })
     it('deve retornar erro na busca por path id sem enviar o id', () => {
 
-      usersApi.consultUserById().then(response => {
+      cy.consultarUsuarioPorId().then(response => {
         expect(response.status).to.eq(400)
         expect(response.body.id).to.eq('id deve ter exatamente 16 caracteres alfanuméricos')
       })
     })
 
     it('deve retornar usuário nao encontrao', () => {
-      usersApi.consultUserById('jogfODIlXsqxNFS2').then(response => {
+      cy.consultarUsuarioPorId('jogfODIlXsqxNFS2').then(response => {
         expect(response.status).to.eq(400)
         expect(response.body.message).to.eq('Usuário não encontrado')
       })
@@ -230,7 +229,7 @@ describe('Users', () => {
 
     it('deve realizar login', () => {
 
-      usersApi.login(user.email, user.password).then(response => {
+      cy.login(user.email, user.password).then(response => {
         expect(response.status).to.eq(200)
         expect(response.body.message).to.eq('Login realizado com sucesso')
         cy.log(JSON.stringify(response.body));
@@ -245,14 +244,14 @@ describe('Users', () => {
     })
 
     it('deve recusar login para senha errada', () => {
-      usersApi.login(user.email, 'SenhaErrada').then(response => {
+      cy.login(user.email, 'SenhaErrada').then(response => {
         expect(response.status).to.eq(401)
         expect(response.body.message).to.eq('Email e/ou senha inválidos')
       })
     })
 
     it('deve recusar login email errado', () => {
-      usersApi.login('emailerrado@qa.com.br', user.password).then(response => {
+      cy.login('emailerrado@qa.com.br', user.password).then(response => {
         expect(response.status).to.eq(401)
         expect(response.body.message).to.eq('Email e/ou senha inválidos')
 
@@ -262,16 +261,19 @@ describe('Users', () => {
 
   context('editar usuário', () => {
     it('deve editar o usuário', () => {
-      usersApi.editUser(usuarioId, user_edit).then(response => {
+      cy.editarUsuario(usuarioId, user_edit).then(response => {
         expect(response.status).to.eq(200)
         expect(response.body.message).to.eq('Registro alterado com sucesso')
       })
     })
 
     it('deve dar erro email duplicado', () => {
-      usersApi.editUser(usuarioId, dup_email).then(response => {
-        expect(response.status).to.eq(400)
-        expect(response.body.message).to.eq('Este email já está sendo usado')
+      cy.criarUsuario(dup_email).then(responseConsulta => {
+        const usuarioId = responseConsulta.body._id
+        cy.editarUsuario(usuarioId, dup_email).then(response => {
+          expect(response.status).to.eq(400)
+          expect(response.body.message).to.eq('Este email já está sendo usado')
+        })
       })
     })
   })
@@ -281,12 +283,12 @@ describe('Users', () => {
 
     it('deve deletar usuário', () => {
 
-      usersApi.create(userdelete).then(response => {
+      cy.criarUsuario(userdelete).then(response => {
         expect(response.status).to.eq(201)
 
         usuarioIdRemovido = response.body._id
 
-        usersApi.deleteUser(usuarioIdRemovido).then(response => {
+        cy.deletarUsuario(usuarioIdRemovido).then(response => {
           expect(response.status).to.eq(200)
           expect(response.body).to.be.an('object')
           expect(Object.keys(response.body)).to.have.length(1);
@@ -297,14 +299,14 @@ describe('Users', () => {
     })
 
     it('deve retornar nenhum usuário deletado com ID já deletado', () => {
-      usersApi.deleteUser(usuarioIdRemovido).then(response => {
+      cy.deletarUsuario(usuarioIdRemovido).then(response => {
         expect(response.status).to.eq(200)
         expect(response.body.message).to.eq('Nenhum registro excluído')
       })
     })
 
     it('deve retornar nenhum usuário deletado sem passar o ID', () => {
-      usersApi.deleteUser().then(response => {
+      cy.deletarUsuario().then(response => {
         expect(response.status).to.eq(200)
         expect(response.body.message).to.eq('Nenhum registro excluído')
       })

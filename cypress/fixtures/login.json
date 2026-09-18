@@ -1,7 +1,7 @@
 {
      "user": {
           "nome": "Guilherme Silvestre Ribeiro",
-          "email": "guilherme@qa.com.com",
+          "email": "guilherme@qa.com.br",
           "password": "SenhaForte@123",
           "administrador": "true"
      },
@@ -13,7 +13,7 @@
      },
      "dup_email": {
           "nome": "Guilherme Silvestre Ribeiro",
-          "email": "guilherme@qa.com.br",
+          "email": "guilherme@hotmail.com",
           "password": "SenhaForte@123",
           "administrador": "true"
      },

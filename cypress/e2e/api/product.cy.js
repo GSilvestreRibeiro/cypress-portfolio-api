@@ -1,10 +1,8 @@
-import ProductApi from "../../service/productRequest.api"
 import UsersApi from "../../service/usersRequest.api"
 
 
 describe('Produtos', () => {
 
-    const productApi = new ProductApi()
     const usersApi = new UsersApi()
 
     let createProduct
@@ -33,19 +31,27 @@ describe('Produtos', () => {
                     cy.editarUsuario(usuarioId, user)
                 }
             })
+            
         })
     })
-    /*beforeEach(() => {
+    beforeEach(() => {
         cy.fixture('product').then((massa) => {
             createProduct = massa.createProduct
-            user = massa.user
+            
+
+            cy.consultarProduto({ nome: createProduct.nome }).then(responseConsulta => {
+                if(responseConsulta.body.quantidade > 0 && responseConsulta.body.produtos[0].nome === (createProduct.nome)){
+                const productId = responseConsulta.body.produtos[0]._id
+                cy.deletarProduto(productId, token)
+                }
+            })
         })
-    })*/
+    })
 
     context('cadastro de produto', () => {
 
         it('deve dar erro de 401 token ausente', () => {
-            productApi.create(createProduct).then(response => {
+            cy.cadastrarProduto(createProduct).then(response => {
                 expect(response.status).to.eq(401)
                 expect(response.body.message).to.eq('Token de acesso ausente, inválido, expirado ou usuário do token não existe mais')
 
@@ -53,7 +59,7 @@ describe('Produtos', () => {
         })
 
         it('deve cadastrar produto', () => {
-            productApi.create(createProduct, token).then(response => {
+            cy.cadastrarProduto(createProduct, token).then(response => {
                 expect(response.status).to.eq(201)
                 expect(response.body.message).to.eq('Cadastro realizado com sucesso')
                 expect(response.body._id).to.not.be.empty
@@ -74,7 +80,7 @@ describe('Produtos', () => {
                 expect(response.status).to.eq(201)
                 expect(response.body.message).to.eq('Cadastro realizado com sucesso')
 
-                productApi.create(createProduct, token).then(response => {
+                cy.cadastrarProduto(createProduct, token).then(response => {
                     expect(response.status).to.eq(400)
                     expect(response.body.message).to.eq('Já existe produto com esse nome')
 
@@ -96,12 +102,12 @@ describe('Produtos', () => {
                     cy.editarUsuario(usuarioId, user_edit).then(response => {
                         expect(response.status).to.eq(200)
                     })
-                    productApi.create(createProduct, token).then(response => {
+                    cy.cadastrarProduto(createProduct, token).then(response => {
                         expect(response.status).to.eq(403)
                         expect(response.body.message).to.eq('Rota exclusiva para administradores')
                     })
                 } else {
-                    productApi.create(createProduct, token).then(response => {
+                    cy.cadastrarProduto(createProduct, token).then(response => {
                         expect(response.status).to.eq(403)
                         expect(response.body.message).to.eq('Rota exclusiva para administradores')
                     })
@@ -114,7 +120,153 @@ describe('Produtos', () => {
     })
 
     context('listar produtos', () => {
-        
+
+        it('Deve consultar produto pelo _id', () => {
+            
+            cy.cadastrarProduto(createProduct, token).then(response => {
+                const productId = response.body._id
+                expect(response.status).to.eq(201)
+
+                cy.consultarProduto({_id: productId}).then( responseConsulta => {
+                    expect(responseConsulta.status).to.eq(200)
+                    expect(responseConsulta.body).to.have.all.keys('quantidade', 'produtos')
+                    expect(responseConsulta.body.quantidade).to.be.a('number')
+                    expect(responseConsulta.body.produtos).to.be.an('array').that.is.not.empty
+
+                    const product = responseConsulta.body.produtos[0]
+
+                    expect(product).to.have.all.keys('_id', 'nome', 'preco', 'descricao', 'quantidade')
+                    expect(product._id).to.eq(productId)
+
+                    cy.deletarProduto(productId, token)
+                })
+
+            })
+        })
+
+        it('Deve consultar produto pelo nome', () => {
+
+            cy.cadastrarProduto(createProduct, token).then(response => {
+                const productId = response.body._id
+                expect(response.status).to.eq(201)
+
+                cy.consultarProduto({nome: createProduct.nome}).then(responseConsulta => {
+                    expect(responseConsulta.status).to.eq(200)
+                    expect(responseConsulta.body).to.have.all.keys('quantidade', 'produtos')
+                    expect(responseConsulta.body.quantidade).to.be.a('number')
+                    expect(responseConsulta.body.produtos).to.be.an('array').that.is.not.empty
+
+                    const products = responseConsulta.body.produtos
+
+                    products.forEach(products => {
+                        expect(products).to.have.all.keys('_id', 'nome', 'preco', 'descricao', 'quantidade')
+                        expect(products.nome.toLowerCase()).to.eq(createProduct.nome.toLowerCase())
+                    })
+                    cy.deletarProduto(productId, token)
+                })
+            })
+
+        })
+
+        it('Deve consultar produto pelo preço', () => {
+
+            cy.cadastrarProduto(createProduct, token).then(response => {
+                const productId = response.body._id
+
+                cy.consultarProduto({preco: createProduct.preco}).then(responseConsulta => {
+                    expect(responseConsulta.status).to.eq(200)
+                    expect(responseConsulta.body).to.have.all.keys('quantidade', 'produtos')
+                    expect(responseConsulta.body.quantidade).to.be.a('number')
+                    expect(responseConsulta.body.produtos).to.be.an('array').that.is.not.empty
+
+                    const products = responseConsulta.body.produtos
+
+                    products.forEach(products => {
+                        expect(products).to.have.all.keys('_id', 'nome', 'preco', 'descricao', 'quantidade')
+                        expect(products).to.deep.include(createProduct.preco)
+                    })
+                    cy.deletarProduto(productId, token)
+                })
+            })
+
+        })
+
+        it('Deve consultar produto pela descrição', () => {
+
+            cy.cadastrarProduto(createProduct, token).then(response => {
+                const productId = response.body._id
+
+                cy.consultarProduto({descricao: createProduct.descricao}).then(responseConsulta => {
+                    expect(responseConsulta.status).to.eq(200)
+                    expect(responseConsulta.body).to.have.all.keys('quantidade', 'produtos')
+                    expect(responseConsulta.body.quantidade).to.be.a('number')
+                    expect(responseConsulta.body.produtos).to.be.an('array').that.is.not.empty
+
+                    const products = responseConsulta.body.produtos
+
+
+                    products.forEach(products => {
+                        expect(products).to.have.all.keys('_id', 'nome', 'preco', 'descricao', 'quantidade')
+                        expect(products.descricao.toLowerCase()).to.include(createProduct.descricao.toLowerCase())
+                    })
+                    cy.deletarProduto(productId, token)
+                })
+            })
+        })
+
+        it('Deve consultar produto pela quantidade', () => {
+
+            cy.cadastrarProduto(createProduct, token).then(response => {
+                const productId = response.body._id
+
+                cy.consultarProduto({quantidade: createProduct.quantidade}).then(responseConsulta => {
+                    expect(responseConsulta.status).to.eq(200)
+                    expect(responseConsulta.body).to.have.all.keys('quantidade', 'produtos')
+                    expect(responseConsulta.body.quantidade).to.be.a('number')
+                    expect(responseConsulta.body.produtos).to.be.an('array').that.is.not.empty
+
+                    const products = responseConsulta.body.produtos
+
+                    products.forEach(products => {
+                        expect(products).to.have.all.keys('_id', 'nome', 'preco', 'descricao', 'quantidade')
+                        expect(products).to.deep.include(createProduct.quantidade)
+
+                    })
+
+                    cy.deletarProduto(productId, token)
+                })
+            })
+
+        })
+
+        it.only('Deve consultar produto utilizando múltiplos filtros', () => {
+            
+            cy.cadastrarProduto(createProduct, token).then(response => {
+                const productId = response.body._id
+
+                cy.consultarProduto({
+                    _id: productId,
+                    nome: createProduct.nome,
+                    preco: createProduct.preco,
+                    descricao: createProduct.descricao,
+                    quantidade: createProduct.quantidade
+                }).then(responseConsulta => {
+                    expect(responseConsulta.status).to.eq(200)
+                    expect(responseConsulta.body).to.have.all.keys('quantidade', 'produtos')
+                    expect(responseConsulta.body.quantidade).to.be.a('number')
+                    expect(responseConsulta.body.produtos).to.be.an('array').that.is.not.empty
+
+                    const products = responseConsulta.body.produtos
+
+                    products.forEach(products => {
+                        expect(products).to.deep.include(createProduct)
+                    })
+                })
+                cy.deletarProduto(productId, token)
+            })
+
+        })
+
     })
 
     context('excluir produto', () => {
@@ -125,7 +277,7 @@ describe('Produtos', () => {
                 const productId = response.body._id
                 expect(response.body.message).to.eq('Cadastro realizado com sucesso')
 
-                productApi.delete(productId, token).then(response => {
+                cy.deletarProduto(productId, token).then(response => {
                     expect(response.status).to.eq(200)
                     expect(response.body.message).to.eq('Registro excluído com sucesso')
                 })
@@ -153,7 +305,7 @@ describe('Produtos', () => {
                 expect(response.status).to.eq(201)
                 expect(response.body.message).to.eq('Cadastro realizado com sucesso')
 
-                productApi.delete(productId).then(response => {
+                cy.deletarProduto(productId).then(response => {
                     expect(response.status).to.eq(401)
                     expect(response.body.message).to.eq('Token de acesso ausente, inválido, expirado ou usuário do token não existe mais')
                 })

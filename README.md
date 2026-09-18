@@ -11,14 +11,15 @@ Projeto de testes automatizados de API desenvolvido com Cypress e JavaScript. A 
 
 ## Tecnologias
 
-- [Cypress](https://www.cypress.io/) 15
+- [Cypress](https://www.cypress.io/) 16.1.0
 - JavaScript (CommonJS/ES modules)
 - [cypress-plugin-api](https://github.com/filiphric/cypress-plugin-api)
-- Node.js e npm
+- Node.js 22.23.2 
+- npm 10.9.8
 
 ## Pré-requisitos
 
-- Node.js 18 ou superior instalado
+- Node.js 22.x, 24.x ou 26.x
 - npm disponível no terminal
 - Acesso à internet para alcançar a API ServeRest
 
@@ -55,26 +56,6 @@ npx cypress run --spec "cypress/e2e/api/users.cy.js"
 npx cypress run --spec "cypress/e2e/api/product.cy.js"
 ```
 
-## Cenários cobertos
-
-### Usuários
-
-- Cadastro com validação de campos obrigatórios
-- Cadastro com e-mail já utilizado
-- Consulta por ID, nome, e-mail, senha e administrador
-- Consulta sem filtros e consulta sem resultados
-- Consulta por ID via path
-- Tratamento de ID ausente ou usuário inexistente
-- Login
-- Operações de edição e exclusão utilizadas no ciclo dos testes
-
-### Produtos
-
-- Login para obtenção do token de autorização
-- Cadastro sem token
-- Cadastro de produto autenticado
-- Exclusão de produto autenticada
-
 ## Estrutura do projeto
 
 ```text
@@ -85,7 +66,9 @@ npx cypress run --spec "cypress/e2e/api/product.cy.js"
 │   ├── e2e
 │   │   └── api              # Especificações de teste de usuários e produtos
 │   ├── fixtures             # Dados usados pelos testes
+│   ├── service              # Métodos para realizar requisição
 │   └── support              # Comandos e configuração global do Cypress
+├── package-lock.json        # Registra as versões exatas das dependências e subdependências.
 ├── package.json             # Dependências e scripts do projeto
 └── README.md
 ```

@@ -1,12 +1,12 @@
 {
   "name": "cypress-portfolio-api",
   "version": "1.0.0",
-  "description": "Projeto de testes de API do Northwind",
+  "description": "Projeto de testes de API da ServeRest",
   "keywords": [
     "cypress",
     "api",
     "rest",
-    "northwind"
+    "ServeRest"
   ],
   "license": "ISC",
   "author": "Guilherme Ribeiro",
@@ -16,7 +16,7 @@
     "test": "npx cypress run"
   },
   "devDependencies": {
-    "cypress": "^15.21.0",
+    "cypress": "^16.1.0",
     "cypress-plugin-api": "^2.12.2"
   }
 }

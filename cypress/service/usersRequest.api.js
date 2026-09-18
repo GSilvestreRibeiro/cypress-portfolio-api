@@ -37,8 +37,8 @@ class UsersApi {
         })
     }
 
-    consultUser(query = {}) {
-        const params = new URLSearchParams(query).toString()
+    consultUser(queryParams = {}) {
+        const params = new URLSearchParams(queryParams).toString()
         const url = params ? `/usuarios?${params}` : '/usuarios'
 
         return cy.api({
